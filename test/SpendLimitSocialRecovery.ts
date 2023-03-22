@@ -187,6 +187,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
       });
     });
   });
+  
   describe("Social Recovery 4337 Tests", function () {
     describe("Set guardian", function () {
       it("Should set the guardian correctly", async function () {
