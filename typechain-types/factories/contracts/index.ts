@@ -6,5 +6,7 @@ export * as tokenSol from "./Token.sol";
 export { SLWalletFactory__factory } from "./SLWalletFactory__factory";
 export { SRWalletFactory__factory } from "./SRWalletFactory__factory";
 export { SocialRecovery__factory } from "./SocialRecovery__factory";
+export { SpdLmtSoRcvry__factory } from "./SpdLmtSoRcvry__factory";
+export { SpdLmtSoRcvryFactory__factory } from "./SpdLmtSoRcvryFactory__factory";
 export { SpendLimitToken__factory } from "./SpendLimitToken__factory";
 export { Wallet__factory } from "./Wallet__factory";

@@ -97,6 +97,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SocialRecovery__factory>;
     getContractFactory(
+      name: "SpdLmtSoRcvry",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SpdLmtSoRcvry__factory>;
+    getContractFactory(
+      name: "SpdLmtSoRcvryFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SpdLmtSoRcvryFactory__factory>;
+    getContractFactory(
       name: "SpendLimit",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SpendLimit__factory>;
@@ -222,6 +230,16 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.SocialRecovery>;
+    getContractAt(
+      name: "SpdLmtSoRcvry",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SpdLmtSoRcvry>;
+    getContractAt(
+      name: "SpdLmtSoRcvryFactory",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SpdLmtSoRcvryFactory>;
     getContractAt(
       name: "SpendLimit",
       address: string,

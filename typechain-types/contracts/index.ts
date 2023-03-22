@@ -8,5 +8,7 @@ export type { tokenSol };
 export type { SLWalletFactory } from "./SLWalletFactory";
 export type { SRWalletFactory } from "./SRWalletFactory";
 export type { SocialRecovery } from "./SocialRecovery";
+export type { SpdLmtSoRcvry } from "./SpdLmtSoRcvry";
+export type { SpdLmtSoRcvryFactory } from "./SpdLmtSoRcvryFactory";
 export type { SpendLimitToken } from "./SpendLimitToken";
 export type { Wallet } from "./Wallet";

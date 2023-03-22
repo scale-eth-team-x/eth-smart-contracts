@@ -1,4 +1,3 @@
-import { SocialRecovery } from './../../typechain-types/contracts/SocialRecovery.sol/SocialRecovery';
 import { SpendLimit } from "./../../typechain-types/contracts/SpendLimitETH.sol/SpendLimit";
 import {
   SimpleAccount,
@@ -13,6 +12,9 @@ import {
   SLWalletFactory,
   SRWalletFactory,
   SRWalletFactory__factory,
+  SocialRecovery,
+  SpdLmtSoRcvry,
+  SpdLmtSoRcvryFactory,
 } from "../../typechain-types";
 
 export async function createAccount(
@@ -75,10 +77,10 @@ export async function createSocialRecoveryAccount(
   );
   await accountFactory.createAccount(accountOwner, 0);
   const accountAddress = await accountFactory.getAddress(accountOwner, 0);
-  
+
   const socialRecovery = await ethers.getContractFactory("SocialRecovery");
   const proxy = socialRecovery.attach(accountAddress).connect(ethersSigner);
-  
+
   return {
     implementation,
     accountFactory,
@@ -111,6 +113,42 @@ export async function createSpendLimitAccount(
 
   const spendlimit = await ethers.getContractFactory("SpendLimit");
   const proxy = await spendlimit.attach(accountAddress).connect(ethersSigner);
+  return {
+    implementation,
+    accountFactory,
+    proxy,
+    walletAddressBeforeCreate,
+  };
+}
+
+export async function createSlSoRcvryAccount(
+  ethersSigner: Signer,
+  accountOwner: string,
+  entryPoint: string,
+  _factory?: SpdLmtSoRcvryFactory
+): Promise<{
+  proxy: SpdLmtSoRcvry;
+  accountFactory: SpdLmtSoRcvryFactory;
+  implementation: string;
+  walletAddressBeforeCreate: string;
+}> {
+  const slsrWalletFact = (await ethers.getContractFactory(
+    "SpdLmtSoRcvryFactory"
+  )) as unknown as SpdLmtSoRcvryFactory;
+  const accountFactory =
+    _factory ?? (await slsrWalletFact.connect(ethersSigner).deploy(entryPoint));
+  const implementation = await accountFactory.slsrAccountImplementation();
+  const walletAddressBeforeCreate = await accountFactory.getAddress(
+    accountOwner,
+    0
+  );
+  await accountFactory.createAccount(accountOwner, 0);
+  const accountAddress = await accountFactory.getAddress(accountOwner, 0);
+
+  const spdLmtSoRcvry = await ethers.getContractFactory("SpdLmtSoRcvry");
+  const proxy = (await spdLmtSoRcvry
+    .attach(accountAddress)
+    .connect(ethersSigner)) as unknown as SpdLmtSoRcvry;
   return {
     implementation,
     accountFactory,
