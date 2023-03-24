@@ -1,9 +1,15 @@
 import { ethers } from "hardhat";
-import { createSlSoRcvryAccount, createSocialRecoveryAccount, createSpendLimitAccount } from "../test/helpers";
+import { createAccount, createSlSoRcvryAccount, createSocialRecoveryAccount, createSpendLimitAccount } from "../test/helpers";
 
 async function main() {
   const [signer] = await ethers.getSigners();
   const entryPointAddr = "0x0576a174D229E3cFA37253523E645A78A0C91B57"
+
+  const { proxy, accountFactory } = await createAccount(
+    signer,
+    signer.address,
+    entryPointAddr
+  );
 
   const { proxy: srAccount, accountFactory: srAccountFactory } = await createSocialRecoveryAccount(
     signer,
@@ -23,13 +29,17 @@ async function main() {
     entryPointAddr
   );
 
-  console.log("EntryPoint Addr =", entryPointAddr)
-  console.log("Social Recovery Addr =", srAccount.address)
+  console.log("\nEntryPoint Addr =", entryPointAddr)
+
+  console.log("\nOri AA-4337 Account Addr", proxy.address);
+  console.log("Ori AA-4337 Account FacotryAddr =", accountFactory.address);
+
+  console.log("\nSocial Recovery Addr =", srAccount.address)
   console.log("Social Recovery Factory Addr =", srAccountFactory.address)
   console.log("Spend Limit Addr =", slAccount.address)
   console.log("Spend Limit Factory Addr =", slAccountFactory.address)
   console.log("Spend Limit + Social Recovery Addr =", slsrAccount.address)
-  console.log("Spend Limit + Social Recovery Factory Addr =", slsrAccountFactory.address)
+  console.log("Spend Limit + Social Recovery Factory Addr =", slsrAccountFactory.address) 
 }
 
 // We recommend this pattern to be able to use async/await everywhere
