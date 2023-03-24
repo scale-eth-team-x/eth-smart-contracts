@@ -12,8 +12,16 @@ const config: HardhatUserConfig = {
     goerli: {
       url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [GOERLI_PRIVATE_KEY]
+    },
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [GOERLI_PRIVATE_KEY]
+    },
+    mumbai: {
+      url: ` https://polygon-mumbai.infura.io/v3/4458cf4d1689497b9a38b1d6bbf05e78`,
+      accounts: [GOERLI_PRIVATE_KEY]
     }
-  }
+  }  
 };
 
 export default config;
