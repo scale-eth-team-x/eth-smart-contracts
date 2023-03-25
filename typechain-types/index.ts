@@ -18,8 +18,6 @@ export type { IEntryPoint } from "./@account-abstraction/contracts/interfaces/IE
 export { IEntryPoint__factory } from "./factories/@account-abstraction/contracts/interfaces/IEntryPoint__factory";
 export type { IStakeManager } from "./@account-abstraction/contracts/interfaces/IStakeManager";
 export { IStakeManager__factory } from "./factories/@account-abstraction/contracts/interfaces/IStakeManager__factory";
-export type { SimpleAccount } from "./@account-abstraction/contracts/samples/SimpleAccount";
-export { SimpleAccount__factory } from "./factories/@account-abstraction/contracts/samples/SimpleAccount__factory";
 export type { IERC1822Proxiable } from "./@openzeppelin/contracts/interfaces/draft-IERC1822.sol/IERC1822Proxiable";
 export { IERC1822Proxiable__factory } from "./factories/@openzeppelin/contracts/interfaces/draft-IERC1822.sol/IERC1822Proxiable__factory";
 export type { IERC1271 } from "./@openzeppelin/contracts/interfaces/IERC1271";
