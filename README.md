@@ -15,6 +15,13 @@ Spend Limit Factory Addr = 0x248A8bc74eF0D8e586dACFB5989e88ff732d5bAc
 Spend Limit + Social Recovery Addr = 0x7AfCe3F99da37C28F91d8a601C6D5E7966c73881
 Spend Limit + Social Recovery Factory Addr = 0xAe4920CA06cCa2cdb2F8ebA8753e52dCABd219c0
 
+3. ZkSync
+Refer to https://github.com/scale-eth-team-x/zksync-deploy  
+
+Social Recovery Factory = 0x99CB1ff9f030D3fA380c4B3081Ef8875bE78dD49  
+Spend Limit Factory = 0x39d7f74037f28A4C5aB7bDe445F04be41B17EDe0  
+Spend Limit + Social Recovery Factory = 0x619bB10fE2386622c4CCc6632ac71EF26C00Dd8E  
+
 ```shell
 npx hardhat help
 npx hardhat test
