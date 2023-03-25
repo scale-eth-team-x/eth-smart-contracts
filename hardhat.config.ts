@@ -24,6 +24,14 @@ const config: HardhatUserConfig = {
     scroll: {
       url: `https://alpha-rpc.scroll.io/l2`,
       accounts: [GOERLI_PRIVATE_KEY]
+    },
+    zkEVM: {
+      url: `https://rpc.public.zkevm-test.net`,
+      accounts: [GOERLI_PRIVATE_KEY]
+    },
+    gnosis_testnet: {
+      url: `https://rpc.chiadochain.net`,
+      accounts: [GOERLI_PRIVATE_KEY]
     }
   }  
 };
