@@ -134,24 +134,42 @@ describe("Social Recovery 4337 Wallet", function () {
     });
 
     it("Should execute the recovery process correctly", async function () {
-      await time.increaseTo((await time.latest()) + 2);
-      await socialRecovery.connect(owner).executeRecovery();
-      expect(await socialRecovery.owner()).to.equal(newOwner.address);
-    });
+        const res = await socialRecovery.recoveryRequest();
+        const newOwnerAddr = res[0];
+        const requestedAt = Number(res[1]);
+        const nonce = await socialRecovery.recoveryNonce();
+      
+        const recoveryHash = ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'uint256'],
+            [newOwnerAddr, requestedAt, Number(nonce)]
+          );
+      
+        await time.increaseTo((await time.latest()) + 2);
+        let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+        await socialRecovery.connect(guardian).executeRecovery(signature);
 
-    it("Should revert if not owner or guardian", async function () {
-      await expect(
-        socialRecovery.connect(addr1).executeRecovery()
-      ).to.be.revertedWith("SocialRecovery: msg sender invalid");
-    });
+        expect(await socialRecovery.owner()).to.equal(newOwnerAddr);
+      });
 
-    it("Should revert if recovery confirmation time not passed", async function () {
-      await expect(
-        socialRecovery.connect(owner).executeRecovery()
-      ).to.be.revertedWith(
-        "SocialRecovery: recovery confirmation time not passed"
-      );
-    });
+      it("Should revert if the execute Recover is not done by guardian", async function () {
+        const res = await socialRecovery.recoveryRequest();
+        const newOwnerAddr = res[0];
+        const requestedAt = Number(res[1]);
+        const nonce = await socialRecovery.recoveryNonce();
+      
+        const recoveryHash = ethers.utils.keccak256(
+          ethers.utils.defaultAbiCoder.encode(
+            ['address', 'uint256', 'uint256'],
+            [newOwnerAddr, requestedAt, Number(nonce)]
+          )
+        );
+      
+        await time.increaseTo((await time.latest()) + 2);
+        let signature = await addr1.signMessage(ethers.utils.arrayify(recoveryHash))
+        await expect(
+            socialRecovery.connect(guardian).executeRecovery(signature)
+          ).to.be.revertedWith("SocialRecovery: invalid signature");
+      });
   });
 
   describe("isValidSignature", function () {

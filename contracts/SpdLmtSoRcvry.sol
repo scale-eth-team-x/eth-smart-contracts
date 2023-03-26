@@ -31,6 +31,7 @@ contract SpdLmtSoRcvry is ERC165, IERC1271, Wallet {
     uint256 public recoveryConfirmationTime = 1;
     address public guardian;
     RecoveryRequest public recoveryRequest;
+    uint256 public recoveryNonce;
 
     mapping(address => Limit) limits; // token => Limit
 
@@ -150,6 +151,7 @@ contract SpdLmtSoRcvry is ERC165, IERC1271, Wallet {
             newOwner: newOwner,
             requestedAt: requestedAt
         });
+        recoveryNonce++;
     }
 
     function cancelRecovery() public {
@@ -161,16 +163,13 @@ contract SpdLmtSoRcvry is ERC165, IERC1271, Wallet {
         delete recoveryRequest;
     }
 
-    function executeRecovery() public {
-        require(
-            msg.sender == owner || msg.sender == guardian,
-            "SocialRecovery: msg sender invalid"
-        );
-        require(
-            recoveryRequest.requestedAt + recoveryConfirmationTime <
-                block.timestamp,
-            "SocialRecovery: recovery confirmation time not passed"
-        );
+    function executeRecovery(bytes calldata signature) public {
+        bytes32 recoveryHash = keccak256(abi.encodePacked(recoveryRequest.newOwner, recoveryRequest.requestedAt, recoveryNonce));
+        bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(recoveryHash);
+
+        address recoveredAddress = ECDSA.recover(prefixedHash, signature);
+        require(recoveredAddress == guardian, "SocialRecovery: invalid signature");
+
         owner = recoveryRequest.newOwner;
         delete recoveryRequest;
     }

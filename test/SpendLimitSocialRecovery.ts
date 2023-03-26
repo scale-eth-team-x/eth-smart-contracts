@@ -11,8 +11,6 @@ import { ethers } from "hardhat";
 import {
   createAccountOwner,
   createSlSoRcvryAccount,
-  createSocialRecoveryAccount,
-  createSpendLimitAccount,
   getBalance,
 } from "./helpers";
 import { parseEther } from "ethers/lib/utils";
@@ -113,7 +111,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
 
     describe("Test Spend Limit Function by calling Transfer", function () {
       it("owner should be able to call transfer if the spending limit is not enabled", async () => {
-        const { proxy: account } = await createSpendLimitAccount(
+        const { proxy: account } = await createSlSoRcvryAccount(
           ethers.provider.getSigner(),
           owner.address,
           entryPoint.address
@@ -127,7 +125,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
       });
 
       it("other account should not be able to call transfer", async () => {
-        const { proxy: account } = await createSpendLimitAccount(
+        const { proxy: account } = await createSlSoRcvryAccount(
           ethers.provider.getSigner(),
           owner.address,
           entryPoint.address
@@ -187,7 +185,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
       });
     });
   });
-  
+
   describe("Social Recovery 4337 Tests", function () {
     describe("Set guardian", function () {
       it("Should set the guardian correctly", async function () {
@@ -269,23 +267,41 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
       });
 
       it("Should execute the recovery process correctly", async function () {
+        const res = await spdLmtSoRcvry.recoveryRequest();
+        const newOwnerAddr = res[0];
+        const requestedAt = Number(res[1]);
+        const nonce = await spdLmtSoRcvry.recoveryNonce();
+      
+        const recoveryHash = ethers.utils.solidityKeccak256(
+            ['address', 'uint256', 'uint256'],
+            [newOwnerAddr, requestedAt, Number(nonce)]
+          );
+      
         await time.increaseTo((await time.latest()) + 2);
-        await spdLmtSoRcvry.connect(owner).executeRecovery();
-        expect(await spdLmtSoRcvry.owner()).to.equal(newOwner.address);
+        let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+        await spdLmtSoRcvry.connect(guardian).executeRecovery(signature);
+
+        expect(await spdLmtSoRcvry.owner()).to.equal(newOwnerAddr);
       });
 
-      it("Should revert if not owner or guardian", async function () {
-        await expect(
-          spdLmtSoRcvry.connect(addr1).executeRecovery()
-        ).to.be.revertedWith("SocialRecovery: msg sender invalid");
-      });
-
-      it("Should revert if recovery confirmation time not passed", async function () {
-        await expect(
-          spdLmtSoRcvry.connect(owner).executeRecovery()
-        ).to.be.revertedWith(
-          "SocialRecovery: recovery confirmation time not passed"
+      it("Should revert if the execute Recover is not done by guardian", async function () {
+        const res = await spdLmtSoRcvry.recoveryRequest();
+        const newOwnerAddr = res[0];
+        const requestedAt = Number(res[1]);
+        const nonce = await spdLmtSoRcvry.recoveryNonce();
+      
+        const recoveryHash = ethers.utils.keccak256(
+          ethers.utils.defaultAbiCoder.encode(
+            ['address', 'uint256', 'uint256'],
+            [newOwnerAddr, requestedAt, Number(nonce)]
+          )
         );
+      
+        await time.increaseTo((await time.latest()) + 2);
+        let signature = await addr1.signMessage(ethers.utils.arrayify(recoveryHash))
+        await expect(
+            spdLmtSoRcvry.connect(guardian).executeRecovery(signature)
+          ).to.be.revertedWith("SocialRecovery: invalid signature");
       });
     });
 
