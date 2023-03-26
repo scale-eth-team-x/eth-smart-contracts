@@ -223,7 +223,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
           await spdLmtSoRcvry.connect(owner).setGuardian(guardian.address);
           const recoveryHash = ethers.utils.solidityKeccak256(
             ['address'],
-            [owner.address]
+            [entryPoint.address]
           );
       
           let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
@@ -235,7 +235,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
         it("Should revert if not guardian", async function () {
           const recoveryHash = ethers.utils.solidityKeccak256(
             ['address'],
-            [owner.address]
+            [entryPoint.address]
           );
         
           let signature = await addr1.signMessage(ethers.utils.arrayify(recoveryHash))
@@ -250,7 +250,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
           await spdLmtSoRcvry.connect(owner).setGuardian(guardian.address);
           const recoveryHash = ethers.utils.solidityKeccak256(
             ['address'],
-            [owner.address]
+            [entryPoint.address]
             );
         
           let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
@@ -260,7 +260,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
         it("Should cancel the recovery process correctly", async function () {
           const recoveryHash = ethers.utils.solidityKeccak256(
                 ['address'],
-                [owner.address]
+                [entryPoint.address]
                 );
             
           let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
@@ -272,7 +272,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
         it("Should revert if not owner", async function () {
           const recoveryHash = ethers.utils.solidityKeccak256(
             ['address'],
-            [owner.address]
+            [entryPoint.address]
             );
             
           let signature = await addr1.signMessage(ethers.utils.arrayify(recoveryHash))
@@ -284,7 +284,7 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
         it("Should revert if no recovery request", async function () {
           const recoveryHash = ethers.utils.solidityKeccak256(
             ['address'],
-            [owner.address]
+            [entryPoint.address]
             );
             
           let signature = await owner.signMessage(ethers.utils.arrayify(recoveryHash))
@@ -301,8 +301,8 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
           await spdLmtSoRcvry.connect(owner).setRecoveryConfirmationTime(1); // 1 second for testing purposes
           const recoveryHash = ethers.utils.solidityKeccak256(
             ['address'],
-            [owner.address]
-            );
+            [entryPoint.address]
+          );
         
           let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
           await spdLmtSoRcvry.connect(guardian).initRecovery(newOwner.address, signature);

@@ -58,7 +58,7 @@ contract SocialRecovery is ERC165, IERC1271, Wallet {
     }
 
     function signatureCheck(bytes calldata signature) internal view returns (address) {
-        bytes32 recoveryHash = keccak256(abi.encodePacked(owner));
+        bytes32 recoveryHash = keccak256(abi.encodePacked(entryPoint()));
         bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(recoveryHash);
 
         address recoveredAddress = ECDSA.recover(prefixedHash, signature);
