@@ -26,10 +26,12 @@
 | Social Recovery Factory               | 0xCE43a6bAddb2040C6Bc93C2798c1a052039C1d2E |
 | Spend Limit Factory                   | 0x07358Ce6f7Bce6b8Abfd4b8De5c4428904bC2742 |
 | Spend Limit + Social Recovery Factory | 0x4A5a89F9cbe356e755985DC1b7d8A13818679f70 |
+|                                       |                                            |
+| Optimism                              |                                            |
+| Social Recovery Factory               | 0x4Da3F2Ebcf69701E50e492C004cA3aF7E1c91307 |
+| Spend Limit Factory                   | 0x97d9Ff7b5C376F4daB9F1e9f329B7eeE83745EFb |
+| Spend Limit + Social Recovery Factory | 0x7D663a30aD596103Dadbd83a61cb2cd80244Bcc0 |
 
-
-
-6. Optimism Mainnet
 
 ```shell
 npx hardhat help
