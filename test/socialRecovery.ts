@@ -88,40 +88,76 @@ describe("Social Recovery 4337 Wallet", function () {
   describe("Initiate recovery process", function () {
     it("Should initiate recovery process correctly", async function () {
       await socialRecovery.connect(owner).setGuardian(guardian.address);
-      await socialRecovery.connect(guardian).initRecovery(newOwner.address);
+      const recoveryHash = ethers.utils.solidityKeccak256(
+        ['address'],
+        [owner.address]
+      );
+  
+      let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+      await socialRecovery.connect(guardian).initRecovery(newOwner.address, signature);
       const recoveryRequest = await socialRecovery.recoveryRequest();
       expect(recoveryRequest.newOwner).to.equal(newOwner.address);
     });
 
     it("Should revert if not guardian", async function () {
+      const recoveryHash = ethers.utils.solidityKeccak256(
+        ['address'],
+        [owner.address]
+      );
+    
+      let signature = await addr1.signMessage(ethers.utils.arrayify(recoveryHash))
       await expect(
-        socialRecovery.connect(addr1).initRecovery(addr2.address)
-      ).to.be.revertedWith("SocialRecovery: msg sender invalid");
+        socialRecovery.connect(addr1).initRecovery(addr2.address, signature)
+      ).to.be.revertedWith("SocialRecovery: not owner or guardian");
     });
   });
 
   describe("Cancel recovery", function () {
     beforeEach(async function () {
       await socialRecovery.connect(owner).setGuardian(guardian.address);
-      await socialRecovery.connect(guardian).initRecovery(newOwner.address);
+      const recoveryHash = ethers.utils.solidityKeccak256(
+        ['address'],
+        [owner.address]
+        );
+    
+      let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+      await socialRecovery.connect(guardian).initRecovery(newOwner.address, signature);
     });
 
     it("Should cancel the recovery process correctly", async function () {
-      await socialRecovery.connect(owner).cancelRecovery();
+      const recoveryHash = ethers.utils.solidityKeccak256(
+            ['address'],
+            [owner.address]
+            );
+        
+      let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+      await socialRecovery.connect(owner).cancelRecovery(signature);
       const recoveryRequest = await socialRecovery.recoveryRequest();
       expect(recoveryRequest.newOwner).to.equal(ethers.constants.AddressZero);
     });
 
     it("Should revert if not owner", async function () {
+      const recoveryHash = ethers.utils.solidityKeccak256(
+        ['address'],
+        [owner.address]
+        );
+        
+      let signature = await addr1.signMessage(ethers.utils.arrayify(recoveryHash))
       await expect(
-        socialRecovery.connect(addr1).cancelRecovery()
-      ).to.be.revertedWith("SocialRecovery: msg sender invalid");
+        socialRecovery.connect(addr1).cancelRecovery(signature)
+      ).to.be.revertedWith("SocialRecovery: not owner or guardian");
     });
 
     it("Should revert if no recovery request", async function () {
-      await socialRecovery.connect(owner).cancelRecovery();
+      const recoveryHash = ethers.utils.solidityKeccak256(
+        ['address'],
+        [owner.address]
+        );
+        
+      let signature = await owner.signMessage(ethers.utils.arrayify(recoveryHash))
+      await socialRecovery.connect(owner).cancelRecovery(signature);
       await expect(
-        socialRecovery.connect(owner).cancelRecovery()
+        socialRecovery.connect(owner).cancelRecovery(signature)
       ).to.be.revertedWith("SocialRecovery: request invalid");
     });
   });
@@ -130,7 +166,13 @@ describe("Social Recovery 4337 Wallet", function () {
     beforeEach(async function () {
       await socialRecovery.connect(owner).setGuardian(guardian.address);
       await socialRecovery.connect(owner).setRecoveryConfirmationTime(1); // 1 second for testing purposes
-      await socialRecovery.connect(guardian).initRecovery(newOwner.address);
+      const recoveryHash = ethers.utils.solidityKeccak256(
+        ['address'],
+        [owner.address]
+        );
+    
+      let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+      await socialRecovery.connect(guardian).initRecovery(newOwner.address, signature);
     });
 
     it("Should execute the recovery process correctly", async function () {

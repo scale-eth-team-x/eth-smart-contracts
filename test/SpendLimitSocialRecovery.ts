@@ -219,52 +219,94 @@ describe("SpendLimit + Social Recovery 4337 Wallet", function () {
     });
 
     describe("Initiate recovery process", function () {
-      it("Should initiate recovery process correctly", async function () {
-        await spdLmtSoRcvry.connect(owner).setGuardian(guardian.address);
-        await spdLmtSoRcvry.connect(guardian).initRecovery(newOwner.address);
-        const recoveryRequest = await spdLmtSoRcvry.recoveryRequest();
-        expect(recoveryRequest.newOwner).to.equal(newOwner.address);
+        it("Should initiate recovery process correctly", async function () {
+          await spdLmtSoRcvry.connect(owner).setGuardian(guardian.address);
+          const recoveryHash = ethers.utils.solidityKeccak256(
+            ['address'],
+            [owner.address]
+          );
+      
+          let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+          await spdLmtSoRcvry.connect(guardian).initRecovery(newOwner.address, signature);
+          const recoveryRequest = await spdLmtSoRcvry.recoveryRequest();
+          expect(recoveryRequest.newOwner).to.equal(newOwner.address);
+        });
+    
+        it("Should revert if not guardian", async function () {
+          const recoveryHash = ethers.utils.solidityKeccak256(
+            ['address'],
+            [owner.address]
+          );
+        
+          let signature = await addr1.signMessage(ethers.utils.arrayify(recoveryHash))
+          await expect(
+            spdLmtSoRcvry.connect(addr1).initRecovery(addr2.address, signature)
+          ).to.be.revertedWith("SocialRecovery: not owner or guardian");
+        });
       });
-
-      it("Should revert if not guardian", async function () {
-        await expect(
-          spdLmtSoRcvry.connect(addr1).initRecovery(addr2.address)
-        ).to.be.revertedWith("SocialRecovery: msg sender invalid");
+    
+      describe("Cancel recovery", function () {
+        beforeEach(async function () {
+          await spdLmtSoRcvry.connect(owner).setGuardian(guardian.address);
+          const recoveryHash = ethers.utils.solidityKeccak256(
+            ['address'],
+            [owner.address]
+            );
+        
+          let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+          await spdLmtSoRcvry.connect(guardian).initRecovery(newOwner.address, signature);
+        });
+    
+        it("Should cancel the recovery process correctly", async function () {
+          const recoveryHash = ethers.utils.solidityKeccak256(
+                ['address'],
+                [owner.address]
+                );
+            
+          let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+          await spdLmtSoRcvry.connect(owner).cancelRecovery(signature);
+          const recoveryRequest = await spdLmtSoRcvry.recoveryRequest();
+          expect(recoveryRequest.newOwner).to.equal(ethers.constants.AddressZero);
+        });
+    
+        it("Should revert if not owner", async function () {
+          const recoveryHash = ethers.utils.solidityKeccak256(
+            ['address'],
+            [owner.address]
+            );
+            
+          let signature = await addr1.signMessage(ethers.utils.arrayify(recoveryHash))
+          await expect(
+            spdLmtSoRcvry.connect(addr1).cancelRecovery(signature)
+          ).to.be.revertedWith("SocialRecovery: not owner or guardian");
+        });
+    
+        it("Should revert if no recovery request", async function () {
+          const recoveryHash = ethers.utils.solidityKeccak256(
+            ['address'],
+            [owner.address]
+            );
+            
+          let signature = await owner.signMessage(ethers.utils.arrayify(recoveryHash))
+          await spdLmtSoRcvry.connect(owner).cancelRecovery(signature);
+          await expect(
+            spdLmtSoRcvry.connect(owner).cancelRecovery(signature)
+          ).to.be.revertedWith("SocialRecovery: request invalid");
+        });
       });
-    });
-
-    describe("Cancel recovery", function () {
-      beforeEach(async function () {
-        await spdLmtSoRcvry.connect(owner).setGuardian(guardian.address);
-        await spdLmtSoRcvry.connect(guardian).initRecovery(newOwner.address);
-      });
-
-      it("Should cancel the recovery process correctly", async function () {
-        await spdLmtSoRcvry.connect(owner).cancelRecovery();
-        const recoveryRequest = await spdLmtSoRcvry.recoveryRequest();
-        expect(recoveryRequest.newOwner).to.equal(ethers.constants.AddressZero);
-      });
-
-      it("Should revert if not owner", async function () {
-        await expect(
-          spdLmtSoRcvry.connect(addr1).cancelRecovery()
-        ).to.be.revertedWith("SocialRecovery: msg sender invalid");
-      });
-
-      it("Should revert if no recovery request", async function () {
-        await spdLmtSoRcvry.connect(owner).cancelRecovery();
-        await expect(
-          spdLmtSoRcvry.connect(owner).cancelRecovery()
-        ).to.be.revertedWith("SocialRecovery: request invalid");
-      });
-    });
-
-    describe("Execute recovery", function () {
-      beforeEach(async function () {
-        await spdLmtSoRcvry.connect(owner).setGuardian(guardian.address);
-        await spdLmtSoRcvry.connect(owner).setRecoveryConfirmationTime(1); // 1 second for testing purposes
-        await spdLmtSoRcvry.connect(guardian).initRecovery(newOwner.address);
-      });
+    
+      describe("Execute recovery", function () {
+        beforeEach(async function () {
+          await spdLmtSoRcvry.connect(owner).setGuardian(guardian.address);
+          await spdLmtSoRcvry.connect(owner).setRecoveryConfirmationTime(1); // 1 second for testing purposes
+          const recoveryHash = ethers.utils.solidityKeccak256(
+            ['address'],
+            [owner.address]
+            );
+        
+          let signature = await guardian.signMessage(ethers.utils.arrayify(recoveryHash))
+          await spdLmtSoRcvry.connect(guardian).initRecovery(newOwner.address, signature);
+        });
 
       it("Should execute the recovery process correctly", async function () {
         const res = await spdLmtSoRcvry.recoveryRequest();
