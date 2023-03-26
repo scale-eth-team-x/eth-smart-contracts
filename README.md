@@ -26,6 +26,7 @@
 | Spend Limit + Social Recovery Factory | 0xDbe5B640A114035930Ce763B4604762023cc84AD |
 |                                       |                                            |
 | Gnosis                                |                                            |
+|---------------------------------------|--------------------------------------------|
 | Social Recovery Factory               | 0xCE43a6bAddb2040C6Bc93C2798c1a052039C1d2E |
 | Spend Limit Factory                   | 0x07358Ce6f7Bce6b8Abfd4b8De5c4428904bC2742 |
 | Spend Limit + Social Recovery Factory | 0x4A5a89F9cbe356e755985DC1b7d8A13818679f70 |
